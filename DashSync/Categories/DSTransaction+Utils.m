@@ -29,6 +29,7 @@
 #import "DSPriceManager.h"
 #import "DSAccount.h"
 #import "DSWallet.h"
+#import "NSString+Bitcoin.h"
 
 @implementation DSTransaction (Utils)
 
@@ -139,6 +140,10 @@
     return [NSDate dateWithTimeIntervalSince1970:self.timestamp];
 }
 
+- (NSString *)txHashText {
+    return [NSString hexWithData:[NSData dataWithBytes:self.txHash.u8 length:sizeof(UInt256)].reverse];
+}
+
 static NSString *dateFormat(NSString *template)
 {
     NSString *format = [NSDateFormatter dateFormatFromTemplate:template options:0 locale:[NSLocale currentLocale]];
@@ -154,5 +159,6 @@ static NSString *dateFormat(NSString *template)
               options:NSBackwardsSearch|NSAnchoredSearch range:NSMakeRange(0, format.length)];
     return format;
 }
+
 
 @end

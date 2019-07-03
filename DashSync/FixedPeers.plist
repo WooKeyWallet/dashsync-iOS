@@ -2,8 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <array>
-	<integer>1815980770</integer>
-	<integer>1389565233</integer>
+	<real>1815980770</real>
+	<real>1389565233</real>
 	<integer>1806306782</integer>
 	<integer>1389565220</integer>
 	<integer>1389565226</integer>
@@ -27,7 +27,7 @@
 	<integer>757134237</integer>
 	<integer>2915518014</integer>
 	<integer>3283475419</integer>
-	<integer>3113145488</integer>
+	<real>3113145488</real>
 	<integer>1496138529</integer>
 	<integer>3114641651</integer>
 	<integer>3105646478</integer>
@@ -71,7 +71,7 @@
 	<integer>3114054360</integer>
 	<integer>2448401287</integer>
 	<integer>2737614543</integer>
-	<integer>2160555001</integer>
-	<integer>1816001374</integer>
+	<real>2160555001</real>
+	<real>1816001374</real>
 </array>
 </plist>

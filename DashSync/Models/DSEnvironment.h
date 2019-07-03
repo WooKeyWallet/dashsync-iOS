@@ -8,7 +8,7 @@
 #import <Foundation/Foundation.h>
 
 #define DSLocalizedString(key, comment) \
-[[DSEnvironment sharedInstance].resourceBundle localizedStringForKey:(key) value:@"" table:nil]
+[[DSEnvironment sharedInstance] localizedStringForKey:(key)]
 
 #ifdef DEBUG
 #define DSDLog(s, ...) NSLog(s, ##__VA_ARGS__)
@@ -23,5 +23,7 @@
 @property (nonatomic,strong) NSBundle * _Nonnull resourceBundle;
 
 + (instancetype _Nullable)sharedInstance;
+
+- (NSString * _Nonnull)localizedStringForKey:(NSString *)key;
 
 @end

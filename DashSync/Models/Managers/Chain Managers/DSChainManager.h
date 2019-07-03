@@ -59,6 +59,8 @@ FOUNDATION_EXPORT NSString* const DSChainManagerNotificationChainKey;
 
 - (void)rescan;
 
+- (void)resetStartSyncHeight;
+
 @end
 
 NS_ASSUME_NONNULL_END

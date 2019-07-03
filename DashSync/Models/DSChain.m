@@ -241,6 +241,10 @@ static checkpoint mainnet_checkpoint_array[] = {
     [self retrieveStandaloneDerivationPaths];
 }
 
+-(void)reloadWallets {
+    self.mWallets = [NSMutableArray array];
+    [self retrieveWallets];
+}
 
 -(instancetype)initAsDevnetWithIdentifier:(NSString*)identifier checkpoints:(NSArray<DSCheckpoint*>*)checkpoints port:(uint32_t)port dapiPort:(uint32_t)dapiPort ixPreviousConfirmationsNeeded:(uint64_t)ixPreviousConfirmationsNeeded
 {

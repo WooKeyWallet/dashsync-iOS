@@ -50,6 +50,7 @@ typedef void (^DSTransactionChallengeBlock)(NSString * challengeTitle, NSString 
 typedef void (^DSTransactionErrorNotificationBlock)(NSString * _Nullable errorTitle, NSString * _Nullable errorMessage,BOOL shouldCancel);
 
 typedef BOOL (^DSTransactionCreationCompletionBlock)(DSTransaction *tx, NSString * prompt, uint64_t amount); //return is whether we should continue automatically
+typedef void (^DSTransactionCreationSuccessBlock)(DSTransaction *tx, NSString *address, uint64_t amount, uint64_t fee);
 
 typedef BOOL (^DSTransactionSigningCompletionBlock)(DSTransaction * tx, NSError * _Nullable error, BOOL cancelled); //return is whether we should continue automatically
 
@@ -82,6 +83,13 @@ typedef void (^DSTransactionRequestRelayCompletionBlock)(DSTransaction * tx, DSP
 - (void)confirmProtocolRequest:(DSPaymentProtocolRequest *)protoReq forAmount:(uint64_t)requestedAmount fromAccount:(DSAccount*)account addressIsFromPasteboard:(BOOL)addressIsFromPasteboard requestingAdditionalInfo:(DSTransactionCreationRequestingAdditionalInfoBlock)additionalInfoRequest presentChallenge:(DSTransactionChallengeBlock)challenge transactionCreationCompletion:(DSTransactionCreationCompletionBlock)transactionCreationCompletion signedCompletion:(DSTransactionSigningCompletionBlock)signedCompletion publishedCompletion:(DSTransactionPublishedCompletionBlock)publishedCompletion requestRelayCompletion:(DSTransactionRequestRelayCompletionBlock _Nullable)requestRelayCompletion errorNotificationBlock:(DSTransactionErrorNotificationBlock)errorNotificationBlock;
 
 - (void)confirmProtocolRequest:(DSPaymentProtocolRequest *)protoReq forAmount:(uint64_t)requestedAmount fromAccount:(DSAccount*)account acceptReusingAddress:(BOOL)acceptReusingAddress addressIsFromPasteboard:(BOOL)addressIsFromPasteboard acceptUncertifiedPayee:(BOOL)acceptUncertifiedPayee requestingAdditionalInfo:(DSTransactionCreationRequestingAdditionalInfoBlock)additionalInfoRequest presentChallenge:(DSTransactionChallengeBlock)challenge transactionCreationCompletion:(DSTransactionCreationCompletionBlock)transactionCreationCompletion signedCompletion:(DSTransactionSigningCompletionBlock)signedCompletion publishedCompletion:(DSTransactionPublishedCompletionBlock)publishedCompletion requestRelayCompletion:(DSTransactionRequestRelayCompletionBlock _Nullable)requestRelayCompletion errorNotificationBlock:(DSTransactionErrorNotificationBlock)errorNotificationBlock;
+
+
+- (void)confirmProtocolRequest:(DSPaymentProtocolRequest *)protoReq
+                     forAmount:(uint64_t)requestedAmount
+                   fromAccount:(DSAccount*)account
+ transactionCreationCompletion:(DSTransactionCreationSuccessBlock)transactionCreationCompletion errorNotificationBlock:(DSTransactionErrorNotificationBlock)errorNotificationBlock;
+
 @end
 
 NS_ASSUME_NONNULL_END

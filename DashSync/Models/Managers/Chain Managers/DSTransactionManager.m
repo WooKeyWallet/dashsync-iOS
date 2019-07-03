@@ -144,8 +144,19 @@
         
         return;
     }
+    NSMutableSet *peers;
+    NSTimeInterval t0 = CFAbsoluteTimeGetCurrent();
+    NSTimeInterval t1 = t0;
+    while (YES) {
+        NSTimeInterval t2 = CFAbsoluteTimeGetCurrent();
+        if (t2 - t1 < 0.2 || t1 != t0) continue;
+        t1 = t2;
+        peers = [NSMutableSet setWithSet:self.peerManager.connectedPeers];
+        if (peers.count > 0 || t2 - t0 >= 20) {
+            break;
+        }
+    }
     
-    NSMutableSet *peers = [NSMutableSet setWithSet:self.peerManager.connectedPeers];
     NSValue *hash = uint256_obj(transaction.txHash);
     
     [self addTransactionToPublishList:transaction];
@@ -451,6 +462,87 @@
         CFRunLoopPerformBlock([[NSRunLoop mainRunLoop] getCFRunLoop], kCFRunLoopCommonModes, ^{
             [self signAndPublishTransaction:tx createdFromProtocolRequest:protoReq fromAccount:account toAddress:address withPrompt:suggestedPrompt forAmount:amount requestingAdditionalInfo:additionalInfoRequest presentChallenge:challenge transactionCreationCompletion:transactionCreationCompletion signedCompletion:signedCompletion publishedCompletion:publishedCompletion requestRelayCompletion:requestRelayCompletion errorNotificationBlock:errorNotificationBlock];
         });
+    }
+}
+
+- (void)confirmProtocolRequest:(DSPaymentProtocolRequest *)protoReq
+                     forAmount:(uint64_t)requestedAmount
+                   fromAccount:(DSAccount*)account
+ transactionCreationCompletion:(DSTransactionCreationSuccessBlock)transactionCreationCompletion errorNotificationBlock:(DSTransactionErrorNotificationBlock)errorNotificationBlock {
+    DSChain * chain = account.wallet.chain;
+    DSWallet * wallet = account.wallet;
+    DSPriceManager * priceManager = [DSPriceManager sharedInstance];
+    DSTransaction *tx = nil;
+    uint64_t amount = 0, fee = 0;
+    BOOL valid = protoReq.isValid, outputTooSmall = NO;
+    
+    BOOL requestsInstantSend = protoReq.requestsInstantSend;
+    
+    if (! valid && [protoReq.errorMessage isEqual:DSLocalizedString(@"request expired", nil)]) {
+        errorNotificationBlock(DSLocalizedString(@"bad payment request", nil),protoReq.errorMessage,YES);
+        return;
+    }
+    
+    //TODO: check for duplicates of already paid requests
+    
+    if (requestedAmount == 0) {
+        for (NSNumber *outputAmount in protoReq.details.outputAmounts) {
+            if (outputAmount.unsignedLongLongValue > 0 && outputAmount.unsignedLongLongValue < TX_MIN_OUTPUT_AMOUNT) {
+                outputTooSmall = YES;
+            }
+            amount += outputAmount.unsignedLongLongValue;
+        }
+    }
+    else amount = requestedAmount;
+    
+    
+    NSString *address = [NSString addressWithScriptPubKey:protoReq.details.outputScripts.firstObject onChain:chain];
+    if ([wallet containsAddress:address]) {
+        errorNotificationBlock(@"",DSLocalizedString(@"this payment address is already in your wallet", nil),YES);
+        return;
+    }
+    else if (amount < TX_MIN_OUTPUT_AMOUNT) {
+        errorNotificationBlock(DSLocalizedString(@"couldn't make payment", nil),[NSString stringWithFormat:DSLocalizedString(@"dash payments can't be less than %@", nil),
+                                                                                 [priceManager stringForDashAmount:TX_MIN_OUTPUT_AMOUNT]],YES);
+        return;
+    }
+    else if (outputTooSmall) {
+        errorNotificationBlock(DSLocalizedString(@"couldn't make payment", nil),[NSString stringWithFormat:DSLocalizedString(@"dash transaction outputs can't be less than %@",
+                                                                                                                             nil), [priceManager stringForDashAmount:TX_MIN_OUTPUT_AMOUNT]],YES);
+        return;
+    }
+    
+    if (requestedAmount == 0) {
+        tx = [account transactionForAmounts:protoReq.details.outputAmounts
+                            toOutputScripts:protoReq.details.outputScripts withFee:YES isInstant:requestsInstantSend];
+    }
+    else if (amount <= account.balance) {
+        tx = [account transactionForAmounts:@[@(requestedAmount)]
+                            toOutputScripts:@[protoReq.details.outputScripts.firstObject] withFee:YES isInstant:requestsInstantSend];
+    }
+    
+    if (tx) {
+        amount = [account amountSentByTransaction:tx] - [account amountReceivedFromTransaction:tx]; //safeguard
+        fee = [account feeForTransaction:tx];
+    }
+    else {
+        DSTransaction * tempTx = [account transactionFor:account.balance
+                                                      to:address withFee:NO];
+        uint8_t additionalInputs = (((account.balance - amount) % 1024) >> 8); //get a random amount of additional inputs between 0 and 3, we don't use last bits because they are often 0
+        fee = [chain feeForTxSize:tempTx.size + TX_INPUT_SIZE*additionalInputs isInstant:requestsInstantSend inputCount:tempTx.inputHashes.count + additionalInputs];
+        amount += fee; // pretty much a random fee
+    }
+    
+    for (NSData *script in protoReq.details.outputScripts) {
+        NSString *addr = [NSString addressWithScriptPubKey:script onChain:chain];
+        
+        if (! addr) addr = DSLocalizedString(@"unrecognized address", nil);
+        if ([address rangeOfString:addr].location != NSNotFound) continue;
+        address = [address stringByAppendingFormat:@"%@%@", (address.length > 0) ? @", " : @"", addr];
+    }
+    
+    if (transactionCreationCompletion && tx) {
+        transactionCreationCompletion(tx, address, amount, fee);
     }
 }
 

@@ -69,8 +69,8 @@
 #define MAX_GETDATA_HASHES 50000
 #define ENABLED_SERVICES   0     // we don't provide full blocks to remote nodes
 #define LOCAL_HOST         0x7f000001
-#define CONNECT_TIMEOUT    3.0
-#define MEMPOOL_TIMEOUT    2.0
+#define CONNECT_TIMEOUT    6.0
+#define MEMPOOL_TIMEOUT    4.0
 
 #define LOCK(lock) dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
 #define UNLOCK(lock) dispatch_semaphore_signal(lock);

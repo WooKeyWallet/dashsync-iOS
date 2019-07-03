@@ -41,6 +41,7 @@ typedef NS_ENUM(NSUInteger, DSTransactionStatus) {
 - (NSString*)amountTextReceivedInAccount:(DSAccount*)account;
 - (NSString*)localCurrencyTextForAmountReceivedInAccount:(DSAccount*)account;
 - (NSString*)dateText;
+- (NSString*)txHashText;
 - (NSDate*)transactionDate;
 
 @end

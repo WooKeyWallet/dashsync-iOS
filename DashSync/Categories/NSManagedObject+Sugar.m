@@ -360,7 +360,7 @@ static NSUInteger _fetchBatchSize = 100;
                 if (! [self.context save:&error]) { // persist changes
                     DSDLog(@"%s: %@", __func__, error);
 #if DEBUG
-                    abort();
+//                    abort();
 #endif
                 }
                 

@@ -37,7 +37,7 @@ FOUNDATION_EXPORT NSString* _Nonnull const DSPeerManagerConnectedPeersDidChangeN
 FOUNDATION_EXPORT NSString* _Nonnull const DSPeerManagerDownloadPeerDidChangeNotification;
 FOUNDATION_EXPORT NSString* _Nonnull const DSPeerManagerPeersDidChangeNotification;
 
-#define PEER_MAX_CONNECTIONS 3
+#define PEER_MAX_CONNECTIONS 20
 #define SETTINGS_FIXED_PEER_KEY @"SETTINGS_FIXED_PEER"
 
 
@@ -48,6 +48,7 @@ FOUNDATION_EXPORT NSString* _Nonnull const DSPeerManagerPeersDidChangeNotificati
 
 @interface DSPeerManager : NSObject <DSPeerDelegate, UIAlertViewDelegate>
 
+@property (nonatomic, readonly) BOOL hasConnectedPeers;
 @property (nonatomic, readonly) BOOL connected;
 @property (nonatomic, readonly) NSUInteger peerCount;
 @property (nonatomic, readonly) NSUInteger connectedPeerCount; // number of connected peers

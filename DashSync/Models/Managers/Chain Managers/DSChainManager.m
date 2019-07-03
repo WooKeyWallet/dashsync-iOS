@@ -139,12 +139,10 @@
     [self.chain wipeMasternodes];
     [DSTransactionEntity saveContext];
     
-    if (![self.chain isMainnet]) {
-        [self.chain.chainManager.peerManager removeTrustedPeerHost];
-        [self.chain.chainManager.peerManager clearPeers];
-        [DSPeerEntity deletePeersForChain:chainEntity];
-        [DSPeerEntity saveContext];
-    }
+    [self.chain.chainManager.peerManager removeTrustedPeerHost];
+    [self.chain.chainManager.peerManager clearPeers];
+    [DSPeerEntity deletePeersForChain:chainEntity];
+    [DSPeerEntity saveContext];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:DSWalletBalanceDidChangeNotification object:nil];
@@ -167,6 +165,10 @@
             [self disconnectedRescan];
         }];
     }
+}
+
+-(void)resetStartSyncHeight {
+    self.syncStartHeight = self.chain.lastBlockHeight;
 }
 
 // MARK: - DSChainDelegate

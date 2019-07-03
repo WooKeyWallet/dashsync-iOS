@@ -33,7 +33,7 @@ typedef NS_ENUM(NSUInteger, DSPeerManagerDesiredState) {
     DSPeerManagerDesiredState_Disconnected
 };
 
-#define MAX_CONNECT_FAILURES 20 // notify user of network problems after this many connect failures in a row
+#define MAX_CONNECT_FAILURES 100 // notify user of network problems after this many connect failures in a row
 
 @interface DSPeerManager (Protected)
 
